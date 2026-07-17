@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
-import { FiMail, FiGithub, FiMessageCircle } from "react-icons/fi";
+import { FiMail, FiGithub, FiMessageCircle, FiUser, FiCode, FiFolder, FiClock } from "react-icons/fi";
 import useEasterEggs from "./hooks/useEasterEggs";
 import EasterEggTerminal from "./components/EasterEggTerminal";
 
@@ -17,11 +17,11 @@ import internshipImg from "/internship.jpg";
    ============================================================ */
 
 const NAV_ITEMS = [
-  { label: "about", href: "#about" },
-  { label: "skills", href: "#skills" },
-  { label: "projects", href: "#projects" },
-  { label: "xp", href: "#experience" },
-  { label: "contact", href: "#contact" },
+  { label: "about", href: "#about", icon: FiUser },
+  { label: "skills", href: "#skills", icon: FiCode },
+  { label: "projects", href: "#projects", icon: FiFolder },
+  { label: "xp", href: "#experience", icon: FiClock },
+  { label: "contact", href: "#contact", icon: FiMail },
 ];
 
 const SKILL_CATEGORIES = [
@@ -290,30 +290,52 @@ function Section({ id, label, title, children, alt = false }) {
    Navbar
    ============================================================ */
 
-function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
+function ActivityBar() {
+  const [active, setActive] = useState("about");
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const sections = NAV_ITEMS.map((n) => n.href.replace("#", ""));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        if (visible.length > 0) {
+          setActive(visible[0].target.id);
+        }
+      },
+      { rootMargin: "-30% 0px -60% 0px", threshold: 0 }
+    );
+
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
-      <div className="nav-inner">
-        <a href="#" className="nav-logo">
-          &gt;_ Lyra
-        </a>
-        <ul className="nav-links">
-          {NAV_ITEMS.map((item) => (
-            <li key={item.href}>
-              <a href={item.href}>{item.label}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </nav>
+    <aside className="activity-bar">
+      <a href="#" className="activity-bar-logo" title="Lyra">
+        &gt;_
+      </a>
+      <div className="activity-bar-divider" />
+      {NAV_ITEMS.map((item) => {
+        const Icon = item.icon;
+        const isActive = active === item.href.replace("#", "");
+        return (
+          <a
+            key={item.href}
+            href={item.href}
+            className={`activity-bar-item${isActive ? " active" : ""}`}
+            title={item.label}
+          >
+            <Icon size={20} />
+          </a>
+        );
+      })}
+    </aside>
   );
 }
 
@@ -434,15 +456,6 @@ function Hero() {
         </div>
       </motion.div>
 
-      <motion.div
-        className="hero-scroll"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4, duration: 0.8 }}
-      >
-        <span>scroll</span>
-        <div className="hero-scroll-line" />
-      </motion.div>
     </section>
   );
 }
@@ -515,7 +528,7 @@ function SkillRadar() {
   const size = 200;
   const cx = size / 2;
   const cy = size / 2;
-  const radius = 85;
+  const radius = 70;
   const levels = 5;
   const angleSlice = (2 * Math.PI) / RADAR_DIMS.length;
 
@@ -923,7 +936,7 @@ export default function App() {
 
   return (
     <>
-      <Navbar />
+      <ActivityBar />
       <main>
         <Hero />
         <About />
