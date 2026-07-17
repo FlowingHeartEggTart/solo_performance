@@ -192,6 +192,8 @@ const WORK = [
     ],
     tech: "Python / JavaScript / React / PostgreSQL / Docker / Git / AutoGen / Claude Code",
     photo: internshipImg,
+    link: "https://aiss.nsfocus.com",
+    linkLabel: "AISS 安全社区平台",
   },
   {
     title: "北京字节跳动科技有限公司",
@@ -202,6 +204,8 @@ const WORK = [
       "协调多所北京高校资源与投资者完成选手招募与筛选，对接场地、导师、志愿者及评委资源",
       "现场分享个人 AI 开发实践经验与工具使用心得，助力参赛选手快速上手 AI 编程工具",
     ],
+    link: "https://mp.weixin.qq.com/s/eszXGilEEBT10BNmTSxLeQ",
+    linkLabel: "实习记录视频文章",
   },
 ];
 
@@ -815,6 +819,17 @@ function Experience() {
               {w.tech && (
                 <div className="timeline-item-tech">
                   $ stack: {w.tech}
+                </div>
+              )}
+              {w.link && (
+                <div className="timeline-item-link">
+                  <a
+                    href={w.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {w.linkLabel || w.link.replace("https://", "")} ↗
+                  </a>
                 </div>
               )}
               {w.photo && (
