@@ -11,6 +11,7 @@ import EasterEggTerminal from "./components/EasterEggTerminal";
 import avatarImg from "/avatar.jpg";
 import tourismImg from "/project-tourism.png";
 import internshipImg from "/internship.jpg";
+import cpuEggTartImg from "/cpu-egg-tart.jpg";
 
 /* ============================================================
    Data
@@ -787,7 +788,7 @@ function Writing() {
           flexShrink: 0,
         }}>
           <img
-            src="/cpu-egg-tart.jpg"
+            src={cpuEggTartImg}
             alt="CPU 烤蛋挞"
             style={{
               width: "140px",
