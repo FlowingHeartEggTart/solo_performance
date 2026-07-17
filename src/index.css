@@ -840,7 +840,7 @@ main {
 
 /* ===== Writing section ===== */
 .writing-article-card:hover {
-  background: var(--bg-card-hover) !important;
+  padding-left: 12px !important;
 }
 
 /* ===== Contact ===== */
@@ -1161,6 +1161,6 @@ body.matrix-mode .contact-item {
   }
 
   .writing-article-card:hover {
-    background: var(--bg-card-hover) !important;
+    padding-left: 0 !important;
   }
 }

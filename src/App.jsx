@@ -772,38 +772,33 @@ function Writing() {
       <div style={{
         display: "grid",
         gridTemplateColumns: "auto 1fr",
-        gap: "36px",
+        gap: "48px",
         alignItems: "start",
       }}>
-        {/* Left: public account card — compact */}
+        {/* Left: QR code + info — bare, no box */}
         <div style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          padding: "24px 20px",
-          background: "var(--bg-card)",
-          border: "1px solid var(--border)",
-          width: "200px",
+          alignItems: "flex-start",
+          width: "160px",
           flexShrink: 0,
         }}>
           <img
             src={cpuEggTartImg}
             alt="CPU 烤蛋挞"
             style={{
-              width: "140px",
-              height: "140px",
+              width: "120px",
+              height: "120px",
               objectFit: "cover",
-              marginBottom: "14px",
-              border: "1px solid var(--border)",
+              marginBottom: "16px",
             }}
           />
           <div style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "0.95rem",
+            fontSize: "0.9rem",
             fontWeight: 600,
             color: "var(--accent)",
-            marginBottom: "4px",
+            marginBottom: "6px",
           }}>
             {WRITING.name}
           </div>
@@ -811,39 +806,25 @@ function Writing() {
             fontFamily: "var(--font-mono)",
             fontSize: "0.68rem",
             color: "var(--blue)",
-            marginBottom: "10px",
-            lineHeight: 1.4,
+            lineHeight: 1.5,
           }}>
             &ldquo;{WRITING.slogan}&rdquo;
           </div>
-          <p style={{
-            fontSize: "0.8rem",
-            color: "var(--text-muted)",
-            lineHeight: 1.7,
-          }}>
-            {WRITING.desc}
-          </p>
         </div>
 
-        {/* Right: featured articles */}
-        <div style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "1px",
-          background: "var(--border)",
-          border: "1px solid var(--border)",
-          overflow: "hidden",
-        }}>
+        {/* Right: articles with line separators */}
+        <div>
           <div style={{
-            padding: "14px 20px",
-            background: "var(--bg-card)",
             fontFamily: "var(--font-mono)",
-            fontSize: "0.72rem",
+            fontSize: "0.7rem",
             color: "var(--text-light)",
+            marginBottom: "16px",
+            paddingBottom: "12px",
+            borderBottom: "1px solid var(--border)",
           }}>
             $ ls articles/
           </div>
-          {WRITING.articles.map((a) => (
+          {WRITING.articles.map((a, i) => (
             <a
               key={a.url}
               href={a.url}
@@ -851,10 +832,10 @@ function Writing() {
               rel="noopener noreferrer"
               style={{
                 display: "block",
-                padding: "20px",
-                background: "var(--bg-card)",
+                padding: "16px 0",
+                borderBottom: i < WRITING.articles.length - 1 ? "1px solid var(--border)" : "none",
                 textDecoration: "none",
-                transition: "background 0.2s",
+                transition: "padding-left 0.2s",
               }}
               className="writing-article-card"
             >
@@ -863,12 +844,9 @@ function Writing() {
                 fontFamily: "var(--font-mono)",
                 fontSize: "0.62rem",
                 color: "var(--accent)",
-                background: "var(--accent-dim)",
-                padding: "3px 8px",
-                borderRadius: "0",
-                marginBottom: "8px",
+                marginBottom: "6px",
               }}>
-                {a.tag}
+                [{a.tag}]
               </span>
               <div style={{
                 fontFamily: "var(--font-mono)",
@@ -881,6 +859,16 @@ function Writing() {
               </div>
             </a>
           ))}
+          <p style={{
+            fontSize: "0.82rem",
+            color: "var(--text-muted)",
+            lineHeight: 1.8,
+            marginTop: "20px",
+            paddingTop: "16px",
+            borderTop: "1px solid var(--border)",
+          }}>
+            {WRITING.desc}
+          </p>
         </div>
       </div>
     </Section>
