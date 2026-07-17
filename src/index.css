@@ -1159,4 +1159,8 @@ body.matrix-mode .contact-item {
   .skills-radar-wrap {
     padding: 16px;
   }
+
+  .writing-article-card:hover {
+    background: var(--bg-card-hover) !important;
+  }
 }

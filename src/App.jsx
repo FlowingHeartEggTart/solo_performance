@@ -770,55 +770,55 @@ function Writing() {
     <Section id="writing" label="// blog/" title="技术写作" alt>
       <div style={{
         display: "grid",
-        gridTemplateColumns: "1fr 1fr",
-        gap: "40px",
-        alignItems: "center",
+        gridTemplateColumns: "auto 1fr",
+        gap: "36px",
+        alignItems: "start",
       }}>
-        {/* Left: public account card */}
+        {/* Left: public account card — compact */}
         <div style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
-          padding: "32px 24px",
+          padding: "24px 20px",
           background: "var(--bg-card)",
           border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
+          width: "200px",
+          flexShrink: 0,
         }}>
           <img
             src="/cpu-egg-tart.jpg"
             alt="CPU 烤蛋挞"
             style={{
-              width: "100%",
-              maxWidth: "280px",
-              aspectRatio: "1/1",
+              width: "140px",
+              height: "140px",
               objectFit: "cover",
-              borderRadius: "var(--radius)",
-              marginBottom: "20px",
+              marginBottom: "14px",
               border: "1px solid var(--border)",
             }}
           />
           <div style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "1.1rem",
+            fontSize: "0.95rem",
             fontWeight: 600,
             color: "var(--accent)",
-            marginBottom: "6px",
+            marginBottom: "4px",
           }}>
             {WRITING.name}
           </div>
           <div style={{
             fontFamily: "var(--font-mono)",
-            fontSize: "0.75rem",
+            fontSize: "0.68rem",
             color: "var(--blue)",
-            marginBottom: "14px",
+            marginBottom: "10px",
+            lineHeight: 1.4,
           }}>
             &ldquo;{WRITING.slogan}&rdquo;
           </div>
           <p style={{
-            fontSize: "0.88rem",
+            fontSize: "0.8rem",
             color: "var(--text-muted)",
-            lineHeight: 1.8,
+            lineHeight: 1.7,
           }}>
             {WRITING.desc}
           </p>
@@ -831,7 +831,6 @@ function Writing() {
           gap: "1px",
           background: "var(--border)",
           border: "1px solid var(--border)",
-          borderRadius: "var(--radius-lg)",
           overflow: "hidden",
         }}>
           <div style={{
@@ -841,7 +840,7 @@ function Writing() {
             fontSize: "0.72rem",
             color: "var(--text-light)",
           }}>
-            📌 精选文章
+            $ ls articles/
           </div>
           {WRITING.articles.map((a) => (
             <a
@@ -865,7 +864,7 @@ function Writing() {
                 color: "var(--accent)",
                 background: "var(--accent-dim)",
                 padding: "3px 8px",
-                borderRadius: "2px",
+                borderRadius: "0",
                 marginBottom: "8px",
               }}>
                 {a.tag}
