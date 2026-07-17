@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
-import { FiMail, FiGithub, FiMessageCircle, FiUser, FiCode, FiFolder, FiClock } from "react-icons/fi";
+import { FiMail, FiGithub, FiMessageCircle, FiLinkedin, FiUser, FiCode, FiFolder, FiClock } from "react-icons/fi";
 import useEasterEggs from "./hooks/useEasterEggs";
 import EasterEggTerminal from "./components/EasterEggTerminal";
 
@@ -208,6 +208,24 @@ const WORK = [
     linkLabel: "实习记录视频文章",
   },
 ];
+
+const WRITING = {
+  name: "CPU 烤蛋挞",
+  slogan: "把复杂技术烤成酥软香甜的蛋挞",
+  desc: "个人技术公众号。希望通过我的讲解，把复杂技术烤成酥软香甜的蛋挞——让每个人都能轻松消化。关注 AI 安全、LLM 应用、Agent 开发等前沿话题。",
+  articles: [
+    {
+      title: "从给人看到给 Agent 用 | 社区的产品范式转换",
+      url: "https://mp.weixin.qq.com/s/p7FpTwr06F3DIiCtmE0BDw",
+      tag: "产品范式",
+    },
+    {
+      title: "Trusted Output Assumption | AI Agent 安全的新视角",
+      url: "https://mp.weixin.qq.com/s/vh2vME90jTZRXsaZSG6zgg",
+      tag: "Agent 安全",
+    },
+  ],
+};
 
 const HONORS = [
   { text: "全国大学生数学建模竞赛 北京赛区二等奖", highlight: true },
@@ -744,6 +762,132 @@ function Projects() {
 }
 
 /* ============================================================
+   Writing — Public Account
+   ============================================================ */
+
+function Writing() {
+  return (
+    <Section id="writing" label="// blog/" title="技术写作" alt>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: "40px",
+        alignItems: "center",
+      }}>
+        {/* Left: public account card */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "32px 24px",
+          background: "var(--bg-card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+        }}>
+          <img
+            src="/cpu-egg-tart.jpg"
+            alt="CPU 烤蛋挞"
+            style={{
+              width: "100%",
+              maxWidth: "280px",
+              aspectRatio: "1/1",
+              objectFit: "cover",
+              borderRadius: "var(--radius)",
+              marginBottom: "20px",
+              border: "1px solid var(--border)",
+            }}
+          />
+          <div style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "1.1rem",
+            fontWeight: 600,
+            color: "var(--accent)",
+            marginBottom: "6px",
+          }}>
+            {WRITING.name}
+          </div>
+          <div style={{
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.75rem",
+            color: "var(--blue)",
+            marginBottom: "14px",
+          }}>
+            &ldquo;{WRITING.slogan}&rdquo;
+          </div>
+          <p style={{
+            fontSize: "0.88rem",
+            color: "var(--text-muted)",
+            lineHeight: 1.8,
+          }}>
+            {WRITING.desc}
+          </p>
+        </div>
+
+        {/* Right: featured articles */}
+        <div style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "1px",
+          background: "var(--border)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          overflow: "hidden",
+        }}>
+          <div style={{
+            padding: "14px 20px",
+            background: "var(--bg-card)",
+            fontFamily: "var(--font-mono)",
+            fontSize: "0.72rem",
+            color: "var(--text-light)",
+          }}>
+            📌 精选文章
+          </div>
+          {WRITING.articles.map((a) => (
+            <a
+              key={a.url}
+              href={a.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "block",
+                padding: "20px",
+                background: "var(--bg-card)",
+                textDecoration: "none",
+                transition: "background 0.2s",
+              }}
+              className="writing-article-card"
+            >
+              <span style={{
+                display: "inline-block",
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.62rem",
+                color: "var(--accent)",
+                background: "var(--accent-dim)",
+                padding: "3px 8px",
+                borderRadius: "2px",
+                marginBottom: "8px",
+              }}>
+                {a.tag}
+              </span>
+              <div style={{
+                fontFamily: "var(--font-mono)",
+                fontSize: "0.82rem",
+                fontWeight: 500,
+                color: "var(--text)",
+                lineHeight: 1.5,
+              }}>
+                {a.title}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </Section>
+  );
+}
+
+/* ============================================================
    Experience
    ============================================================ */
 
@@ -886,6 +1030,15 @@ function Contact() {
             <FiMessageCircle className="contact-item-icon" />
             linux.do/u/shadowking
           </a>
+          <a
+            href="https://www.linkedin.com/in/影-李-b326153b3"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="contact-item"
+          >
+            <FiLinkedin className="contact-item-icon" />
+            linkedin.com/in/影-李
+          </a>
         </motion.div>
 
         {/* Honors */}
@@ -957,6 +1110,7 @@ export default function App() {
         <About />
         <Skills />
         <Projects />
+        <Writing />
         <Experience />
         <Contact />
       </main>

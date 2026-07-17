@@ -838,6 +838,11 @@ main {
   object-fit: cover;
 }
 
+/* ===== Writing section ===== */
+.writing-article-card:hover {
+  background: var(--bg-card-hover) !important;
+}
+
 /* ===== Contact ===== */
 .contact-grid {
   display: grid;
