@@ -1,6 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import { FiMail, FiGithub, FiMessageCircle } from "react-icons/fi";
+import useEasterEggs from "./hooks/useEasterEggs";
+import EasterEggTerminal from "./components/EasterEggTerminal";
 
 /* ============================================================
    Images
@@ -15,15 +17,16 @@ import internshipImg from "/internship.jpg";
    ============================================================ */
 
 const NAV_ITEMS = [
-  { label: "关于", href: "#about" },
-  { label: "技能", href: "#skills" },
-  { label: "项目", href: "#projects" },
-  { label: "经历", href: "#experience" },
-  { label: "联系", href: "#contact" },
+  { label: "about", href: "#about" },
+  { label: "skills", href: "#skills" },
+  { label: "projects", href: "#projects" },
+  { label: "xp", href: "#experience" },
+  { label: "contact", href: "#contact" },
 ];
 
 const SKILL_CATEGORIES = [
   {
+    file: "languages.py",
     title: "语言与框架",
     tags: [
       "Python",
@@ -36,6 +39,7 @@ const SKILL_CATEGORIES = [
     ],
   },
   {
+    file: "data.ts",
     title: "数据处理",
     tags: [
       "Pandas",
@@ -48,6 +52,7 @@ const SKILL_CATEGORIES = [
     ],
   },
   {
+    file: "ai.h",
     title: "AI 与 NLP",
     tags: [
       "RAG",
@@ -60,6 +65,7 @@ const SKILL_CATEGORIES = [
     ],
   },
   {
+    file: "security.rs",
     title: "智能体与安全",
     tags: [
       "MCP 协议",
@@ -72,10 +78,12 @@ const SKILL_CATEGORIES = [
     ],
   },
   {
+    file: "db.sql",
     title: "数据库",
     tags: ["MySQL", "SQLite", "MongoDB", "PostgreSQL", "数据建模", "索引优化"],
   },
   {
+    file: "deploy.yaml",
     title: "部署与工具",
     tags: [
       "Linux",
@@ -89,6 +97,15 @@ const SKILL_CATEGORIES = [
   },
 ];
 
+// Radar chart dimensions: AI, Security, Engineering, Data, Systems
+const RADAR_DIMS = [
+  { key: "AI", level: 85, color: "#00e676" },
+  { key: "安全", level: 70, color: "#64b5f6" },
+  { key: "工程", level: 80, color: "#ff79c6" },
+  { key: "数据", level: 75, color: "#ffb86c" },
+  { key: "系统", level: 65, color: "#bd93f9" },
+];
+
 const PROJECTS = [
   {
     period: "2024.12 — 2025.03",
@@ -99,6 +116,7 @@ const PROJECTS = [
       "基于 LangChain + FAISS 构建知识向量数据库，实现高效语义检索与问答召回",
       "LLM 语料构建与 Prompt 模板设计，优化问答结果一致性",
     ],
+    tech: "LangChain · FAISS · Pandas · Regex · LLM",
   },
   {
     period: "2024.03 — 2025.01",
@@ -110,6 +128,7 @@ const PROJECTS = [
       "设计「物理—一致性—美学」三层十维度评分体系，LLM 生成自动化动作评语",
       "Flask + SQL 数据管线，评分与教练一致性达 87%，论文成果已投 SCI",
     ],
+    tech: "MediaPipe · DTW · KNN · Flask · LLM",
   },
   {
     period: "2024 — 2025",
@@ -120,24 +139,23 @@ const PROJECTS = [
       "已被 IEEE ICCTEI 2025 录用",
       "负责 Web 服务搭建与数据接口设计",
     ],
+    tech: "IEEE ICCTEI 2025",
   },
   {
     period: "2025",
     title: "喂喂monster",
     role: "独立开发",
-    desc: [
-      "个人全栈项目，在线部署运行中",
-    ],
+    desc: ["个人全栈项目，在线部署运行中"],
     link: "https://six-flame.vercel.app",
+    tech: "Vercel · Full Stack",
   },
   {
     period: "2025",
     title: "知识客栈",
     role: "产品设计与开发",
-    desc: [
-      "AI 驱动的知识管理产品",
-    ],
+    desc: ["AI 驱动的知识管理产品"],
     link: "https://www.insight-inn.top/",
+    tech: "AI · Product Design",
   },
 ];
 
@@ -189,14 +207,14 @@ const WORK = [
 
 const HONORS = [
   { text: "全国大学生数学建模竞赛 北京赛区二等奖", highlight: true },
-  { text: "国家励志奖学金（Top 2%）", highlight: true },
+  { text: "国家励志奖学金 (Top 2%)", highlight: true },
   { text: "IEEE ICCTEI 2025 论文录用", highlight: true },
-  { text: "优秀毕业设计论文（学院排名第一）", highlight: true },
+  { text: "优秀毕业设计论文 (学院排名第一)", highlight: true },
   { text: "第七届节能节水低碳减排竞赛 北京赛区二等奖", highlight: false },
   { text: "中国国际大学生创新大赛 北京赛区三等奖", highlight: false },
   { text: "全国大学生 C 语言程序设计大赛 三等奖", highlight: false },
   { text: "华北五省计算机应用大赛 三等奖", highlight: false },
-  { text: "Intuition X S1 黑客松一等奖（最佳创意奖）", highlight: false },
+  { text: "Intuition X S1 黑客松一等奖 (最佳创意奖)", highlight: false },
   { text: "She Code Lab 黑客松 扣子特别奖", highlight: false },
   { text: "腾讯云安全零界赛场 优胜奖", highlight: false },
   { text: "连续三年校一等奖学金", highlight: false },
@@ -285,7 +303,7 @@ function Navbar() {
     <nav className={`navbar${scrolled ? " scrolled" : ""}`}>
       <div className="nav-inner">
         <a href="#" className="nav-logo">
-          Lyra
+          &gt;_ Lyra
         </a>
         <ul className="nav-links">
           {NAV_ITEMS.map((item) => (
@@ -300,62 +318,129 @@ function Navbar() {
 }
 
 /* ============================================================
-   Hero
+   Hero (Terminal Window style)
    ============================================================ */
 
 function Hero() {
+  const [typed, setTyped] = useState("");
+  const [showCmd, setShowCmd] = useState(false);
+  const fullName = "Lyra";
+
+  // Typing animation
+  useEffect(() => {
+    if (typed.length < fullName.length) {
+      const timer = setTimeout(() => {
+        setTyped(fullName.slice(0, typed.length + 1));
+      }, 120);
+      return () => clearTimeout(timer);
+    } else {
+      const timer = setTimeout(() => setShowCmd(true), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [typed]);
+
   return (
     <section className="hero">
-      <div className="hero-bg">
-        <div className="hero-bg-orb" />
-        <div className="hero-bg-orb" />
-      </div>
-
       <motion.div
-        className="hero-inner"
-        initial="hidden"
-        animate="visible"
-        variants={stagger(0.15)}
+        className="hero-terminal"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, ease: "easeOut" }}
       >
-        <motion.img
-          src={avatarImg}
-          alt="李影"
-          className="hero-avatar"
-          variants={fadeUpChild}
-        />
+        {/* Terminal title bar */}
+        <div className="hero-terminal-bar">
+          <span className="hero-terminal-dot" />
+          <span className="hero-terminal-dot" />
+          <span className="hero-terminal-dot" />
+          <span className="hero-terminal-title">lyra@portfolio:~</span>
+        </div>
 
-        <motion.p className="hero-greeting" variants={fadeUpChild}>
-          ENFP 快乐小狗报道
-        </motion.p>
+        {/* Terminal body */}
+        <div className="hero-terminal-body">
+          <motion.img
+            src={avatarImg}
+            alt="李影"
+            className="hero-avatar"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          />
 
-        <motion.h1 className="hero-name" variants={fadeUpChild}>
-          Lyra
-        </motion.h1>
+          <motion.p
+            className="hero-greeting"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            $ whoami
+          </motion.p>
 
-        <motion.p className="hero-name-sub" variants={fadeUpChild}>
-          李影 · base 北京
-        </motion.p>
+          <div className="hero-name-wrap">
+            <motion.span
+              className="hero-name"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {typed}
+            </motion.span>
+            <span className="hero-cursor">|</span>
+          </div>
 
-        <motion.div className="hero-titles" variants={fadeUpChild}>
-          <span className="hero-tag">AI 产品</span>
-          <span className="hero-tag">AI 开发</span>
-          <span className="hero-tag">双栖选手</span>
-        </motion.div>
+          <motion.p
+            className="hero-name-sub"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            李影 · base 北京
+          </motion.p>
 
-        <motion.p className="hero-slogan" variants={fadeUpChild}>
-          网页开发 · 大模型应用 · Agent 开发 · AR 交互 + 计算机视觉 · 后端与数据工程
-          <br />
-          超爱 vibe coding，就喜欢用技术搞定实际场景，代码落地能力在线
-        </motion.p>
+          <motion.div
+            className="hero-titles"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <span className="hero-tag">&lt;AI /&gt;</span>
+            <span className="hero-tag">&lt;Dev /&gt;</span>
+            <span className="hero-tag">&lt;Security /&gt;</span>
+          </motion.div>
+
+          <motion.p
+            className="hero-slogan"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+          >
+            网页开发 · 大模型应用 · Agent 开发 · AR 交互 · 计算机视觉 · 后端与数据工程
+            <br />
+            超爱 vibe coding，就喜欢用技术搞定实际场景，代码落地能力在线
+          </motion.p>
+
+          {/* Pseudo terminal command output */}
+          <motion.div
+            className="hero-cmd"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: showCmd ? 1 : 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="hero-cmd-line">$ cat intro.txt</div>
+            <div className="hero-cmd-output">
+              CS科班 · AI 产品/开发双栖 · 绿盟科技天元实验室 · IEEE 论文录用 ·{" "}
+              数学建模二等奖
+            </div>
+          </motion.div>
+        </div>
       </motion.div>
 
       <motion.div
         className="hero-scroll"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1.2, duration: 0.8 }}
+        transition={{ delay: 1.4, duration: 0.8 }}
       >
-        <span>Scroll</span>
+        <span>scroll</span>
         <div className="hero-scroll-line" />
       </motion.div>
     </section>
@@ -371,7 +456,7 @@ function About() {
   const inView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <Section id="about" label="关于我" title="一个简单的介绍">
+    <Section id="about" label="// about.md" title="一个简单的介绍">
       <motion.div
         ref={ref}
         className="about-grid"
@@ -395,8 +480,14 @@ function About() {
             <br />
             <p>
               超爱 <strong>vibe coding</strong>，就喜欢用技术搞定实际场景。
-              运营技术公众号「CPU 烤蛋挞」，维护开源项目，在
-              <a href="https://linux.do/u/shadowking/summary" target="_blank" rel="noopener noreferrer" style={{ color: "var(--accent)", textDecoration: "none" }}> Linux.do </a>
+              运营技术公众号「CPU 烤蛋挞」，维护开源项目，在{" "}
+              <a
+                href="https://linux.do/u/shadowking/summary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Linux.do
+              </a>{" "}
               社区活跃交流。还有很多要进步的！
             </p>
           </div>
@@ -408,7 +499,7 @@ function About() {
             className="about-image"
           />
           <div className="about-image-caption">
-            AI 文旅设计作品
+            &lt;figure&gt; AI 文旅设计作品 &lt;/figure&gt;
           </div>
         </div>
       </motion.div>
@@ -417,15 +508,125 @@ function About() {
 }
 
 /* ============================================================
-   Skills
+   Skills — with file-tab headers + radar chart
    ============================================================ */
+
+function SkillRadar() {
+  const size = 200;
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = 85;
+  const levels = 5;
+  const angleSlice = (2 * Math.PI) / RADAR_DIMS.length;
+
+  const getPoint = (i, level) => {
+    const r = (radius / levels) * level;
+    const angle = angleSlice * i - Math.PI / 2;
+    return { x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) };
+  };
+
+  // Background grid
+  const gridPolygons = [];
+  for (let l = 1; l <= levels; l++) {
+    const pts = RADAR_DIMS.map((_, i) => {
+      const p = getPoint(i, l);
+      return `${p.x},${p.y}`;
+    }).join(" ");
+    gridPolygons.push(
+      <polygon
+        key={`grid-${l}`}
+        points={pts}
+        fill="none"
+        stroke="var(--border)"
+        strokeWidth="1"
+      />
+    );
+  }
+
+  // Axes
+  const axes = RADAR_DIMS.map((_, i) => {
+    const p = getPoint(i, levels);
+    return (
+      <line
+        key={`axis-${i}`}
+        x1={cx}
+        y1={cy}
+        x2={p.x}
+        y2={p.y}
+        stroke="var(--border)"
+        strokeWidth="1"
+      />
+    );
+  });
+
+  // Data polygon
+  const dataPts = RADAR_DIMS.map((d, i) => {
+    const p = getPoint(i, (d.level / 100) * levels);
+    return `${p.x},${p.y}`;
+  }).join(" ");
+
+  // Data dots
+  const dots = RADAR_DIMS.map((d, i) => {
+    const p = getPoint(i, (d.level / 100) * levels);
+    return (
+      <circle
+        key={`dot-${i}`}
+        cx={p.x}
+        cy={p.y}
+        r="4"
+        fill={d.color}
+      />
+    );
+  });
+
+  // Labels
+  const labels = RADAR_DIMS.map((d, i) => {
+    const p = getPoint(i, levels + 1);
+    return (
+      <text
+        key={`label-${i}`}
+        x={p.x}
+        y={p.y}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill={d.color}
+        style={{ fontFamily: "var(--font-mono)", fontSize: "11px", fontWeight: 500 }}
+      >
+        {d.key}
+      </text>
+    );
+  });
+
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      {gridPolygons}
+      {axes}
+      <polygon
+        points={dataPts}
+        fill="rgba(0, 230, 118, 0.08)"
+        stroke="var(--accent)"
+        strokeWidth="1.5"
+      />
+      {dots}
+      {labels}
+    </svg>
+  );
+}
 
 function Skills() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.08 });
 
   return (
-    <Section id="skills" label="专业技能" title="工具箱" alt>
+    <Section id="skills" label="// skills/" title="技术栈" alt>
+      {/* Radar chart */}
+      <div className="skills-radar-wrap">
+        <div>
+          <div className="skills-radar-title">&lt;SkillRadar /&gt;</div>
+          <SkillRadar />
+        </div>
+      </div>
+
       <motion.div
         ref={ref}
         className="skills-grid"
@@ -440,13 +641,12 @@ function Skills() {
             variants={fadeUpChild}
           >
             <div className="skill-card-head">
-              <span className="skill-card-line" />
-              <span className="skill-card-title">{cat.title}</span>
+              <span className="skill-card-file">{cat.file}</span>
             </div>
             <div className="skill-card-tags">
               {cat.tags.map((t) => (
                 <span key={t} className="skill-tag">
-                  {t}
+                  &lt;{t}&gt;
                 </span>
               ))}
             </div>
@@ -466,7 +666,7 @@ function Projects() {
   const inView = useInView(ref, { once: true, amount: 0.08 });
 
   return (
-    <Section id="projects" label="项目作品" title="做过的东西">
+    <Section id="projects" label="// projects/" title="做过的东西">
       <motion.div
         ref={ref}
         className="projects-grid"
@@ -496,21 +696,27 @@ function Projects() {
               </ul>
             </div>
             {p.link && (
-              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border-light)" }}>
+              <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--border)" }}>
                 <a
                   href={p.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
-                    fontSize: "0.82rem",
+                    fontFamily: "var(--font-mono)",
+                    fontSize: "0.72rem",
                     color: "var(--accent)",
                     textDecoration: "none",
-                    borderBottom: "1px solid var(--accent-light)",
+                    borderBottom: "1px solid var(--accent-dim)",
                     paddingBottom: 2,
                   }}
                 >
                   {p.link.replace("https://", "")} ↗
                 </a>
+              </div>
+            )}
+            {p.tech && (
+              <div className="project-card-tech">
+                $ deps: {p.tech}
               </div>
             )}
           </motion.div>
@@ -531,10 +737,10 @@ function Experience() {
   const workInView = useInView(workRef, { once: true, amount: 0.1 });
 
   return (
-    <Section id="experience" label="经历" title="一路走来" alt>
+    <Section id="experience" label="// timeline.log" title="一路走来" alt>
       {/* Education */}
       <div className="timeline-section">
-        <div className="timeline-heading">教育</div>
+        <div className="timeline-heading">## 教育</div>
         <motion.div
           ref={eduRef}
           className="timeline-items"
@@ -567,7 +773,7 @@ function Experience() {
 
       {/* Work */}
       <div className="timeline-section">
-        <div className="timeline-heading">实习</div>
+        <div className="timeline-heading">## 实习</div>
         <motion.div
           ref={workRef}
           className="timeline-items"
@@ -594,17 +800,8 @@ function Experience() {
                 </ul>
               </div>
               {w.tech && (
-                <div
-                  style={{
-                    marginTop: 16,
-                    fontSize: "0.78rem",
-                    color: "var(--accent-dark)",
-                    padding: "10px 0",
-                    borderTop: "1px solid var(--border-light)",
-                    lineHeight: 1.7,
-                  }}
-                >
-                  {w.tech}
+                <div className="timeline-item-tech">
+                  $ stack: {w.tech}
                 </div>
               )}
               {w.photo && (
@@ -629,7 +826,7 @@ function Contact() {
   const inView = useInView(ref, { once: true, amount: 0.1 });
 
   return (
-    <Section id="contact" label="联系" title="找到我">
+    <Section id="contact" label="// contact.json" title="找到我">
       <motion.div
         ref={ref}
         className="contact-grid"
@@ -665,7 +862,7 @@ function Contact() {
 
         {/* Honors */}
         <motion.div variants={fadeUpChild}>
-          <div className="honors-heading">荣誉奖项</div>
+          <div className="honors-heading">// honors</div>
           <div className="honors-grid">
             {HONORS.map((h) => (
               <span
@@ -690,9 +887,9 @@ function Footer() {
   return (
     <footer className="footer">
       <p>
-        © 2026{" "}
+        /* © 2026{" "}
         <a href="https://github.com/FlowingHeartEggTart">Lyra 李影</a> · Made
-        with care
+        with ☕ and late nights */
       </p>
     </footer>
   );
@@ -703,6 +900,27 @@ function Footer() {
    ============================================================ */
 
 export default function App() {
+  const [showTerminal, setShowTerminal] = useState(false);
+
+  // Easter eggs
+  useEasterEggs();
+
+  // Ctrl+K to toggle terminal
+  const handleGlobalKey = useCallback((e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      setShowTerminal((prev) => !prev);
+    }
+    if (e.key === 'Escape' && showTerminal) {
+      setShowTerminal(false);
+    }
+  }, [showTerminal]);
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleGlobalKey);
+    return () => window.removeEventListener('keydown', handleGlobalKey);
+  }, [handleGlobalKey]);
+
   return (
     <>
       <Navbar />
@@ -715,6 +933,11 @@ export default function App() {
         <Contact />
       </main>
       <Footer />
+
+      {/* Easter egg terminal */}
+      {showTerminal && (
+        <EasterEggTerminal onClose={() => setShowTerminal(false)} />
+      )}
     </>
   );
 }
