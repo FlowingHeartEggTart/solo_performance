@@ -12,6 +12,7 @@ import avatarImg from "/avatar.jpg";
 import tourismImg from "/project-tourism.png";
 import internshipImg from "/internship.jpg";
 import cpuEggTartImg from "/cpu-egg-tart.jpg";
+import bytedanceImg from "/bytedance-internship.jpg";
 
 /* ============================================================
    Data
@@ -207,6 +208,7 @@ const WORK = [
     ],
     link: "https://mp.weixin.qq.com/s/eszXGilEEBT10BNmTSxLeQ",
     linkLabel: "实习记录视频文章",
+    photo: bytedanceImg,
   },
 ];
 
